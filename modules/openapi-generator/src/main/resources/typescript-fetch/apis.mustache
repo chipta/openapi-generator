@@ -107,10 +107,19 @@ export class {{classname}} extends runtime.BaseAPI {
         {{/headerParams}}
         {{#authMethods}}
         {{#isBasic}}
+        {{#isBasicBasic}}
         if (this.configuration && (this.configuration.username !== undefined || this.configuration.password !== undefined)) {
             headerParameters["Authorization"] = "Basic " + btoa(this.configuration.username + ":" + this.configuration.password);
         }
-
+        {{/isBasicBasic}}
+        {{#isBasicBearer}}
+        if (this.configuration && this.configuration.accessToken) {
+            const token = typeof this.configuration.accessToken === 'function'
+                ? this.configuration.accessToken("{{name}}", [{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}])
+                : this.configuration.accessToken;
+            headerParameters["Authorization"] = `Bearer ${token}`;
+        }
+        {{/isBasicBearer}}
         {{/isBasic}}
         {{#isApiKey}}
         {{#isKeyInHeader}}
